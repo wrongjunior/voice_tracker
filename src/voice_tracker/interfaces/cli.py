@@ -31,11 +31,8 @@ def run(config_path: str):
                     continue
 
                 for category in set(categories):
-                    current_stats, _ = spreadsheet.get_stats_for_today()
-                    current_value = current_stats.get(category, 0) if current_stats else 0
-                    if not isinstance(current_value, (int, float)): current_value = 0
-                    new_value = current_value + config['point_value']
-                    spreadsheet.update_cell(category, new_value)
+                    value_to_set = config['point_value']
+                    spreadsheet.update_cell(category, value_to_set)
 
             except Exception as e:
                 print(f"Произошла ошибка в цикле: {e}")
