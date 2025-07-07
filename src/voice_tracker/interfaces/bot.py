@@ -1,6 +1,7 @@
 import logging
 import os
 import yaml
+import locale  # <--- Добавлен импорт для установки локали
 from functools import wraps
 from datetime import datetime
 
@@ -12,6 +13,18 @@ from voice_tracker.core.transcriber import Transcriber
 from voice_tracker.core.spreadsheet import SpreadsheetManager
 from voice_tracker.utils.command_parser import parse_command
 from voice_tracker.utils.config_loader import load_config
+
+# --- Настройка локали для корректного отображения месяцев на русском ---
+try:
+    locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+except locale.Error:
+    logger.warning("Русская локаль 'ru_RU.UTF-8' не найдена. Месяцы будут на английском.")
+    # На Windows может потребоваться другой формат, например 'russian'
+    try:
+        locale.setlocale(locale.LC_TIME, 'russian')
+    except locale.Error:
+        logger.warning("Локаль 'russian' для Windows также не найдена.")
+
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,7 +43,9 @@ def restricted(func):
     return wrapped
 
 def format_stats_message(stats: dict) -> str:
-    header = f"Отчет за {datetime.now().strftime('%d %B %Y')}:\n"
+    # --- Ключевое изменение в этой функции ---
+    # '%B' теперь будет выводить русское название месяца благодаря locale.setlocale
+    header = f"Отчет за {datetime.now().strftime('%d %B %Y г')}:\n"
     lines = [f"`{category.capitalize():<15} {value}`" for category, value in stats.items()]
     total_points = sum(stats.values()); footer = f"\n*Всего баллов:* {total_points}"
     return header + "\n".join(lines) + footer
