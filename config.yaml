@@ -32,5 +32,5 @@ point_value: 1
 
 # --- Настройки Whisper ---
 whisper:
-  model_size: "base" # Варианты: tiny, base, small, medium, large. "base" - хороший баланс скорости и качества.
+  model_size: "base" # Варианты: tiny, base, small, medium, large. "base"
   language: "ru"     # Язык для распознавания.

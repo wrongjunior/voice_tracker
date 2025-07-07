@@ -23,7 +23,7 @@
 
 2.  **Склонируйте репозиторий и создайте окружение**:
     ```bash
-    git clone <адрес_вашего_репозитория>
+    git clone https://github.com/wrongjunior/voice_tracker.git
     cd voice_tracker
     python3 -m venv venv
     source venv/bin/activate
