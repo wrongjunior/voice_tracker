@@ -69,7 +69,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     config = context.bot_data['config']
     allowed_id = config.get('telegram', {}).get('allowed_user_id')
-    welcome_text = f"Здравствуйте, {user.first_name}.\nЯ ваш персональный ассистент для трекинга задач.\n\n"
+    welcome_text = f"Здравствуйте, {user.first_name}.\n\n"
     if not allowed_id:
         setup_instruction = ("**Для начала работы, вам необходимо настроить доступ:**\n\n"
                              "1. Остановите этот скрипт (`Ctrl + C` в терминале).\n"
