@@ -3,10 +3,12 @@ from datetime import datetime
 import os
 import shutil
 
+
 class SpreadsheetManager:
     def __init__(self, config: dict):
         self.file_path = config['excel_file_path']
         self.backup_folder = config.get('backup_folder', 'backups')
+        self.max_backups = config.get('max_backups', 20)
         self.categories_map = config['categories']
 
         if not os.path.exists(self.file_path):
@@ -14,12 +16,39 @@ class SpreadsheetManager:
 
         os.makedirs(self.backup_folder, exist_ok=True)
 
+    def _cleanup_old_backups(self):
+        """
+        Проверяет количество бэкапов и удаляет самые старые, если их больше лимита.
+        """
+        if self.max_backups <= 0:
+            return
+
+        try:
+            all_files = os.listdir(self.backup_folder)
+            backup_files = [f for f in all_files if f.startswith('backup_') and f.endswith('.xlsx')]
+
+            if len(backup_files) <= self.max_backups:
+                return
+
+            backup_files.sort(key=lambda f: os.path.getctime(os.path.join(self.backup_folder, f)))
+            files_to_delete = backup_files[:-self.max_backups]
+
+            for filename in files_to_delete:
+                file_path_to_delete = os.path.join(self.backup_folder, filename)
+                os.remove(file_path_to_delete)
+                print(f"Удален старый бэкап: {filename}")
+
+        except OSError as e:
+            print(f"Ошибка при очистке старых бэкапов: {e}")
+
     def _create_backup(self):
+        """Создает резервную копию и запускает очистку старых."""
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         backup_file_path = os.path.join(self.backup_folder, f"backup_{timestamp}.xlsx")
         try:
             shutil.copy(self.file_path, backup_file_path)
             print(f"Резервная копия создана: {backup_file_path}")
+            self._cleanup_old_backups()
         except Exception as e:
             print(f"Не удалось создать резервную копию: {e}")
 
