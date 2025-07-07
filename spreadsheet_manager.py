@@ -63,3 +63,31 @@ class SpreadsheetManager:
             print(f"Произошла ошибка при работе с Excel: {e}")
             print("Восстановите файл из последней резервной копии в папке 'backups', если он повредился.")
             return False
+
+    def get_stats_for_today(self):
+        """Собирает статистику за текущий день и возвращает в виде словаря."""
+        try:
+            workbook = openpyxl.load_workbook(self.file_path)
+            sheet = workbook.active
+
+            col_num = self._find_date_column(sheet)
+            if not col_num:
+                print(f"Статистика: Столбец для сегодня не найден.")
+                return None, "Столбец для текущего дня не найден в таблице."
+
+            stats = {}
+            # categories_map это {'обучение': 2, 'спорт': 6, ...}
+            for category, row_num in self.categories_map.items():
+                cell_value = sheet.cell(row=row_num, column=col_num).value
+                # Если ячейка пустая или содержит не число, считаем за 0
+                if isinstance(cell_value, (int, float)):
+                    stats[category] = cell_value
+                else:
+                    stats[category] = 0
+
+            return stats, None
+
+        except Exception as e:
+            error_message = f"Произошла ошибка при чтении статистики: {e}"
+            print(error_message)
+            return None, error_message
