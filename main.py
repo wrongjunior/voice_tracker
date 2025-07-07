@@ -46,13 +46,13 @@ def main():
                 print(f"Распознано: '{recognized_text}'")
 
                 # 5. Анализ команды
-                category = parse_command(recognized_text, config['category_aliases'])
+                categories = parse_command(recognized_text, config['category_aliases'])
 
-                # 6. Обновление таблицы
-                if category:
-                    spreadsheet.update_cell(category, config['point_value'])
+                if categories:  # Если список не пустой
+                    for category in categories:
+                        spreadsheet.update_cell(category, config['point_value'])
                 else:
-                    print("Команда не выполнена. Не удалось определить категорию.")
+                    print("Команда не выполнена. Не удалось определить ни одной категории.")
 
             except FileNotFoundError as e:
                 print(f"Критическая ошибка: {e}")
